@@ -1,0 +1,26 @@
+{
+  "name": "@whatsapp-secretary/control-plane",
+  "version": "0.1.0",
+  "private": true,
+  "description": "HTTP control plane for WhatsApp webhooks",
+  "main": "dist/main.js",
+  "scripts": {
+    "dev": "tsx watch src/main.ts",
+    "build": "tsc --build",
+    "start": "node dist/main.js",
+    "test": "pnpm build && node --test dist/config/environment.spec.js dist/whatsapp/meta-signature.spec.js dist/whatsapp/webhook.controller.spec.js",
+    "clean": "rm -rf dist *.tsbuildinfo"
+  },
+  "dependencies": {
+    "@nestjs/common": "^11.0.0",
+    "@nestjs/config": "^4.0.0",
+    "@nestjs/core": "^11.0.0",
+    "@nestjs/platform-express": "^11.0.0",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.1"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "tsx": "^4.7.0"
+  }
+}
