@@ -5,6 +5,7 @@ import {
   Get,
   Headers,
   HttpCode,
+  Inject,
   Logger,
   Post,
   Query,
@@ -20,7 +21,7 @@ import { verifyMetaSignature } from './meta-signature';
 export class WebhookController {
   private readonly logger = new Logger(WebhookController.name);
 
-  constructor(private readonly config: ConfigService) {}
+  constructor(@Inject(ConfigService) private readonly config: ConfigService) {}
 
   @Get()
   verify(
