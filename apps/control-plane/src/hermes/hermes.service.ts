@@ -61,11 +61,9 @@ export class HermesService implements OnModuleDestroy {
     timeoutMs: number,
   ): Promise<string> {
     return new Promise((resolve, reject) => {
-      const mcpServerPath = this.config.get<string>('hermes.mcpServerPath');
-      if (!mcpServerPath) {
-        reject(new Error('MCP_SERVER_PATH not configured'));
-        return;
-      }
+      // TODO: Pass MCP server configuration to Hermes via config.yaml or CLI args
+      // For now, Hermes uses the config from ~/.hermes/config.yaml
+      // Future: Add --mcp-server flag or generate config dynamically
 
       // Explicitly specify provider and model to avoid config issues
       // Note: --resume will create a new session if it doesn't exist, but only with a valid format
