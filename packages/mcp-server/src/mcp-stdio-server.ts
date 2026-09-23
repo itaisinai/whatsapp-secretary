@@ -8,6 +8,7 @@ import {
 import { searchEmailsTool } from './tools/search-emails';
 import { GmailProvider } from './providers/gmail-provider';
 import { OutlookProvider } from './providers/outlook-provider';
+import { MockProvider } from './providers/mock-provider';
 import { EmailProvider } from './providers/email-provider';
 import type { SearchEmailsParams } from '@whatsapp-secretary/shared';
 
@@ -139,16 +140,17 @@ export class WhatsAppSecretaryMCPServer {
 
   async initialize(): Promise<void> {
     const emailProvider = process.env.EMAIL_PROVIDER?.toLowerCase();
-    const emailAddress = process.env.EMAIL_ADDRESS;
-    const emailPassword = process.env.EMAIL_PASSWORD;
+    const emailAddress = process.env.EMAIL_ADDRESS || 'test@example.com';
+    const emailPassword = process.env.EMAIL_PASSWORD || 'mock-password';
 
-    if (!emailProvider || !emailAddress || !emailPassword) {
-      throw new Error(
-        'Missing required environment variables: EMAIL_PROVIDER, EMAIL_ADDRESS, EMAIL_PASSWORD'
-      );
-    }
-
-    if (emailProvider === 'gmail') {
+    // Use mock provider if EMAIL_PROVIDER is 'mock' or if credentials are missing
+    if (emailProvider === 'mock' || !process.env.EMAIL_ADDRESS || !process.env.EMAIL_PASSWORD) {
+      console.error('[MCP Server] Using MOCK email provider (no real email connection)');
+      this.emailProvider = new MockProvider({
+        email: emailAddress,
+        password: emailPassword,
+      });
+    } else if (emailProvider === 'gmail') {
       this.emailProvider = new GmailProvider({
         email: emailAddress,
         password: emailPassword,
@@ -159,7 +161,7 @@ export class WhatsAppSecretaryMCPServer {
         password: emailPassword,
       });
     } else {
-      throw new Error(`Unsupported email provider: ${emailProvider}`);
+      throw new Error(`Unsupported email provider: ${emailProvider}. Use 'gmail', 'outlook', or 'mock'`);
     }
 
     await this.emailProvider.initialize();
