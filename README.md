@@ -53,14 +53,60 @@ cp .env.example .env
    - Email credentials
    - Other configuration values
 
+## Getting Started (POC)
+
+### 1. Install Hermes Agent
+
+```bash
+curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash
+source ~/.bashrc  # or ~/.zshrc
+```
+
+### 2. Setup the Project
+
+```bash
+# Install dependencies
+pnpm install
+
+# Copy environment template
+cp .env.example .env
+
+# Edit .env with your credentials
+# See docs/POC_SETUP.md for detailed instructions
+nano .env
+```
+
+### 3. Configure Hermes Integration
+
+```bash
+# Run the setup script
+./scripts/setup-hermes.sh
+```
+
+### 4. Start Using
+
+```bash
+# Start Hermes
+hermes
+
+# Try Hebrew queries:
+# תראה לי את חמשת המיילים האחרונים
+# אילו מיילים עדיין לא קראתי?
+```
+
+📖 **Full usage guide:** [docs/POC_USAGE.md](./docs/POC_USAGE.md)
+
 ## Development
 
 ```bash
-# Run the Hermes controller in development mode
-pnpm dev
-
 # Build all packages
 pnpm build
+
+# Build MCP server only
+pnpm build --filter @whatsapp-secretary/mcp-server
+
+# Test MCP server directly
+cd packages/mcp-server && pnpm mcp
 
 # Run linter
 pnpm lint
