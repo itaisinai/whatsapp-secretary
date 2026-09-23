@@ -22,6 +22,7 @@ export interface WhatsAppConfig {
   accessToken: string;
   graphApiVersion: string;
   testRecipient?: string;
+  testMessageOverride?: string;
 }
 
 export interface HermesConfig {
@@ -50,6 +51,7 @@ export const whatsappConfig = registerAs('whatsapp', (): WhatsAppConfig => {
     accessToken: requiredString(process.env, 'WHATSAPP_ACCESS_TOKEN'),
     graphApiVersion: process.env.WHATSAPP_GRAPH_API_VERSION ?? 'v26.0',
     testRecipient: process.env.WHATSAPP_TEST_RECIPIENT,
+    testMessageOverride: process.env.WHATSAPP_TEST_MESSAGE_OVERRIDE,
   };
 });
 

@@ -105,7 +105,17 @@ export class WebhookController {
         throw new Error('WhatsAppService not initialized - dependency injection failed');
       }
 
-      const hermesResponse = await this.hermesService.processMessage(context.message.text, context);
+      // Use test message override if configured (for testing without triggering real webhooks)
+      const testMessageOverride = this.config.get<string>('whatsapp.testMessageOverride')?.trim();
+      const messageForHermes = testMessageOverride || context.message.text;
+
+      if (testMessageOverride) {
+        this.logger.debug(
+          `Using test message override: "${testMessageOverride}" instead of "${context.message.text}"`,
+        );
+      }
+
+      const hermesResponse = await this.hermesService.processMessage(messageForHermes, context);
 
       this.logger.log(`Hermes response received: "${hermesResponse.response}"`);
 
