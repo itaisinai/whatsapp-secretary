@@ -48,7 +48,7 @@ WhatsApp Secretary is an AI-powered personal assistant for Niv, built on the Her
 ```
 whatsapp-secretary/
 ├── apps/
-│   ├── hermes-controller/        # CLI app for Hermes integration
+│   ├── hermes-controller/        # CLI app for Hermes integration (POC)
 │   │   ├── src/
 │   │   │   ├── index.ts          # CLI entry point
 │   │   │   ├── hermes-controller.ts  # Hermes Agent controller
@@ -56,22 +56,22 @@ whatsapp-secretary/
 │   │   │   └── config/
 │   │   │       └── environment.ts # Environment validation
 │   │   └── package.json
-│   └── nestjs-control-plane/    # NestJS HTTP API (headless mode)
+│   └── control-plane/           # NestJS HTTP control plane
 │       ├── src/
 │       │   ├── main.ts           # NestJS bootstrap
 │       │   ├── app.module.ts     # Root module
-│       │   ├── modules/
-│       │   │   ├── hermes/       # Hermes integration module
-│       │   │   │   ├── hermes.service.ts
-│       │   │   │   ├── hermes.controller.ts
-│       │   │   │   └── hermes.module.ts
-│       │   │   └── health/       # Health check endpoints
+│       │   ├── config/
+│       │   │   └── environment.ts # Environment config (namespaced)
 │       │   ├── common/
-│       │   │   ├── dto/          # Data transfer objects
 │       │   │   ├── filters/      # Exception filters
 │       │   │   └── interceptors/ # Request/response interceptors
-│       │   └── config/
-│       │       └── environment.config.ts
+│       │   ├── whatsapp/         # WhatsApp webhook module
+│       │   │   ├── webhook.controller.ts
+│       │   │   ├── meta-signature.ts
+│       │   │   └── whatsapp.module.ts
+│       │   └── health/           # Health check endpoints
+│       │       ├── health.controller.ts
+│       │       └── health.module.ts
 │       └── package.json
 ├── packages/
 │   ├── mcp-server/               # MCP server with tools
@@ -175,51 +175,53 @@ See `.env.example` and `docs/POC_SETUP.md` for details.
 # Install dependencies
 pnpm install
 
-# Run the CLI app (interactive)
+# Run the CLI app (interactive POC)
 pnpm dev
 
-# Run the NestJS control plane (HTTP API)
-pnpm dev:nestjs
+# Run the control plane (WhatsApp webhook server)
+pnpm dev:control-plane
 
 # Build everything
 pnpm build
 
-# Test connection (CLI)
-pnpm --filter hermes-controller test
+# Test control plane
+pnpm --filter @whatsapp-secretary/control-plane test
 
 # Clean build artifacts
 pnpm clean
 ```
 
-## NestJS Control Plane (Headless Mode)
+## Control Plane (WhatsApp Webhook Server)
 
-The NestJS control plane provides a stateless HTTP API for headless communication with Hermes Agent. This allows external systems (WhatsApp, webhooks, other services) to interact with Hermes without requiring an interactive CLI.
+The control plane is a NestJS HTTP server that handles WhatsApp webhooks and will integrate with Hermes Agent in Phase 2.
 
-**Key Features:**
-- RESTful API for message processing
-- Session management for multiple conversations
-- Direct tool access for testing
-- Health check endpoints for orchestration
-- Structured logging and error handling
+**Current Features (Phase 1):**
+- WhatsApp webhook verification and message receipt
+- Signature validation (Meta X-Hub-Signature-256)
+- Health check endpoints for Kubernetes
+- Global error handling and request logging
+- Production-ready infrastructure
 
-**API Endpoints:**
-- `POST /hermes/message` - Send a message to Hermes
-- `POST /hermes/search-emails` - Direct email search
-- `GET /hermes/test` - Test connections
-- `GET /hermes/sessions` - List active sessions
-- `GET /health` - Health checks
+**Health Endpoints:**
+- `GET /health` - Basic health check
+- `GET /health/ready` - Readiness probe (Kubernetes)
+- `GET /health/live` - Liveness probe (Kubernetes)
+
+**WhatsApp Endpoints:**
+- `GET /webhooks/whatsapp` - Webhook verification
+- `POST /webhooks/whatsapp` - Message receipt (signature validated)
 
 **Running:**
 ```bash
 # Development mode with hot reload
-pnpm dev:nestjs
+pnpm dev:control-plane
 
 # Production build
-pnpm --filter nestjs-control-plane build
-pnpm --filter nestjs-control-plane start
+pnpm --filter @whatsapp-secretary/control-plane build
+pnpm --filter @whatsapp-secretary/control-plane start
 ```
 
-See `apps/nestjs-control-plane/README.md` for detailed API documentation and usage examples.
+**Phase 2 TODO:** Integrate Hermes Agent to process WhatsApp messages and respond with email search results.
 
 ## Important Notes
 

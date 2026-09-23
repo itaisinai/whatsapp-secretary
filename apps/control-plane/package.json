@@ -8,7 +8,7 @@
     "dev": "tsx watch src/main.ts",
     "build": "tsc --build",
     "start": "node dist/main.js",
-    "test": "pnpm build && node --test dist/config/environment.spec.js dist/whatsapp/meta-signature.spec.js dist/whatsapp/webhook.controller.spec.js",
+    "test": "pnpm build && node --test dist/**/*.spec.js",
     "clean": "rm -rf dist *.tsbuildinfo"
   },
   "dependencies": {
@@ -16,6 +16,8 @@
     "@nestjs/config": "^4.0.0",
     "@nestjs/core": "^11.0.0",
     "@nestjs/platform-express": "^11.0.0",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1"
   },

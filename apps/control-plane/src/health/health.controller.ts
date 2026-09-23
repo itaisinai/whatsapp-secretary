@@ -12,15 +12,14 @@ export class HealthController {
 
   @Get('ready')
   ready(): { ready: boolean } {
-    return {
-      ready: true,
-    };
+    // Phase 1: No external dependencies yet, always ready
+    // Phase 2: Will check Hermes gateway availability
+    return { ready: true };
   }
 
   @Get('live')
   live(): { alive: boolean } {
-    return {
-      alive: true,
-    };
+    // Liveness check: process is running
+    return { alive: true };
   }
 }
