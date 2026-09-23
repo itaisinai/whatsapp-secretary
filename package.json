@@ -9,7 +9,8 @@
   ],
   "scripts": {
     "dev": "pnpm --filter hermes-controller dev",
-    "build": "pnpm -r build",
+    "build": "pnpm --filter @whatsapp-secretary/shared build && pnpm --filter @whatsapp-secretary/mcp-server build && pnpm --filter @whatsapp-secretary/hermes-controller build",
+    "build:watch": "pnpm -r --parallel build:watch",
     "lint": "pnpm -r lint",
     "format": "prettier --write \"**/*.{ts,tsx,json,md}\"",
     "clean": "pnpm -r clean && rm -rf node_modules"

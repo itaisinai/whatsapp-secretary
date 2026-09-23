@@ -6,15 +6,24 @@
   "main": "dist/index.js",
   "scripts": {
     "dev": "tsx watch src/index.ts",
+    "mcp": "tsx src/mcp-index.ts",
     "build": "tsc --build",
     "start": "node dist/index.js",
+    "start:mcp": "node dist/mcp-index.js",
     "clean": "rm -rf dist *.tsbuildinfo",
     "lint": "eslint src --ext .ts"
   },
   "dependencies": {
-    "@whatsapp-secretary/shared": "workspace:*"
+    "@whatsapp-secretary/shared": "workspace:*",
+    "@modelcontextprotocol/sdk": "^1.0.4",
+    "dotenv": "^16.3.1",
+    "imap": "^0.8.19",
+    "mailparser": "^3.7.1",
+    "googleapis": "^134.0.0"
   },
   "devDependencies": {
+    "@types/imap": "^0.8.40",
+    "@types/mailparser": "^3.4.4",
     "tsx": "^4.7.0",
     "eslint": "^8.55.0",
     "@typescript-eslint/eslint-plugin": "^6.15.0",
