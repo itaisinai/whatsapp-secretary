@@ -7,10 +7,17 @@ import { createMetaSignature } from './meta-signature';
 import { WebhookController } from './webhook.controller';
 
 function createController(): WebhookController {
-  return new WebhookController(new ConfigService({
+  const config = new ConfigService({
     WHATSAPP_WEBHOOK_VERIFY_TOKEN: 'verify-token',
     WHATSAPP_APP_SECRET: 'app-secret',
-  }));
+    WHATSAPP_PHONE_NUMBER_ID: '123456789',
+    WHATSAPP_ACCESS_TOKEN: 'test-token',
+    WHATSAPP_TEST_RECIPIENT: '972541234567',
+    MCP_SERVER_PATH: '/path/to/mcp.js',
+  });
+  const whatsappService = {} as never;
+  const hermesService = {} as never;
+  return new WebhookController(config, whatsappService, hermesService);
 }
 
 describe('WebhookController', () => {

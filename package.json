@@ -7,10 +7,12 @@
   "scripts": {
     "dev": "pnpm --filter hermes-controller dev",
     "dev:control-plane": "pnpm --filter @whatsapp-secretary/control-plane dev",
+    "dev:poc": "pnpm --filter @whatsapp-secretary/control-plane dev",
     "build": "pnpm --filter @whatsapp-secretary/shared build && pnpm --filter @whatsapp-secretary/mcp-server build && pnpm --filter @whatsapp-secretary/hermes-controller build && pnpm --filter @whatsapp-secretary/control-plane build",
     "build:watch": "pnpm -r --parallel build:watch",
     "lint": "pnpm -r lint",
     "format": "prettier --write \"**/*.{ts,tsx,json,md}\"",
+    "test": "pnpm -r test",
     "clean": "pnpm -r clean && rm -rf node_modules"
   },
   "devDependencies": {

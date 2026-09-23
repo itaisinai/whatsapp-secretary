@@ -36,3 +36,9 @@ coverage/
 tmp/
 temp/
 .pnpm-store/
+
+# Compiled TypeScript files in packages (build artifacts)
+packages/*/src/**/*.js
+packages/*/src/**/*.d.ts
+packages/*/src/**/*.js.map
+packages/*/src/**/*.d.ts.map
