@@ -27,7 +27,6 @@ export class OutlookProvider extends EmailProvider {
       host: 'outlook.office365.com',
       port: 993,
       tls: true,
-      tlsOptions: { rejectUnauthorized: false },
     });
 
     return new Promise((resolve, reject) => {
@@ -142,6 +141,8 @@ export class OutlookProvider extends EmailProvider {
       }
 
       const emails: EmailMessage[] = [];
+      const parsingPromises: Promise<void>[] = [];
+
       const fetch = this.imap.fetch(uids, {
         bodies: '',
         struct: true,
@@ -156,32 +157,38 @@ export class OutlookProvider extends EmailProvider {
           });
         });
 
-        msg.once('end', async () => {
-          try {
-            const parsed = await simpleParser(buffer);
-
-            emails.push({
-              id: `outlook-${seqno}`,
-              threadId: parsed.messageId || `thread-${seqno}`,
-              sender: {
-                name: parsed.from?.value[0]?.name,
-                email: parsed.from?.value[0]?.address || 'unknown',
-              },
-              subject: parsed.subject || '(No Subject)',
-              snippet: parsed.text?.substring(0, 200) || '',
-              receivedAt: parsed.date || new Date(),
-              isUnread: true,
-              sourceUrl: `https://outlook.office365.com/mail/inbox/id/${seqno}`,
+        msg.once('end', () => {
+          // Create a promise for this message's parsing
+          const parsingPromise = simpleParser(buffer)
+            .then((parsed) => {
+              emails.push({
+                id: `outlook-${seqno}`,
+                threadId: parsed.messageId || `thread-${seqno}`,
+                sender: {
+                  name: parsed.from?.value[0]?.name,
+                  email: parsed.from?.value[0]?.address || 'unknown',
+                },
+                subject: parsed.subject || '(No Subject)',
+                snippet: parsed.text?.substring(0, 200) || '',
+                receivedAt: parsed.date || new Date(),
+                isUnread: true,
+                sourceUrl: `https://outlook.office365.com/mail/inbox/id/${seqno}`,
+              });
+            })
+            .catch((error) => {
+              console.error(`[Outlook] Error parsing message ${seqno}:`, error);
             });
-          } catch (error) {
-            console.error(`[Outlook] Error parsing message ${seqno}:`, error);
-          }
+
+          parsingPromises.push(parsingPromise);
         });
       });
 
       fetch.once('error', reject);
 
-      fetch.once('end', () => {
+      fetch.once('end', async () => {
+        // Wait for all parsing to complete
+        await Promise.all(parsingPromises);
+
         emails.sort((a, b) => b.receivedAt.getTime() - a.receivedAt.getTime());
         resolve(emails);
       });

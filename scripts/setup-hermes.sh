@@ -54,11 +54,20 @@ echo "✓ MCP server built successfully"
 # Load environment variables
 export $(cat "$PROJECT_ROOT/.env" | grep -v '^#' | xargs)
 
-# Check required env vars
-if [ -z "$EMAIL_PROVIDER" ] || [ -z "$EMAIL_ADDRESS" ] || [ -z "$EMAIL_PASSWORD" ]; then
-    echo "❌ Missing required environment variables in .env:"
-    echo "  EMAIL_PROVIDER, EMAIL_ADDRESS, EMAIL_PASSWORD"
+# Check required env vars (only for gmail/outlook, not mock)
+if [ -z "$EMAIL_PROVIDER" ]; then
+    echo "❌ Missing EMAIL_PROVIDER in .env"
     exit 1
+fi
+
+# For gmail/outlook, require credentials
+if [ "$EMAIL_PROVIDER" != "mock" ]; then
+    if [ -z "$EMAIL_ADDRESS" ] || [ -z "$EMAIL_PASSWORD" ]; then
+        echo "❌ Missing email credentials in .env for provider: $EMAIL_PROVIDER"
+        echo "  EMAIL_ADDRESS and EMAIL_PASSWORD are required for gmail/outlook"
+        echo "  Or set EMAIL_PROVIDER=mock for testing without credentials"
+        exit 1
+    fi
 fi
 
 echo "✓ Environment variables configured"

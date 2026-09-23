@@ -91,13 +91,23 @@ export class WhatsAppSecretaryMCPServer {
     return schema;
   }
 
-  private async handleSearchEmails(params: SearchEmailsParams) {
+  private async handleSearchEmails(args: any) {
     try {
       if (!this.emailProvider) {
         throw new Error('Email provider not initialized');
       }
 
-      const result = await this.emailProvider.searchEmails(params);
+      // Default to empty object if no arguments provided
+      const params = args ?? {};
+
+      // Convert date strings to Date objects
+      const searchParams: SearchEmailsParams = {
+        ...params,
+        receivedAfter: params.receivedAfter ? new Date(params.receivedAfter) : undefined,
+        receivedBefore: params.receivedBefore ? new Date(params.receivedBefore) : undefined,
+      };
+
+      const result = await this.emailProvider.searchEmails(searchParams);
 
       // Format results for MCP response
       const content = [

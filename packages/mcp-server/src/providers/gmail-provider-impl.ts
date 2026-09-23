@@ -27,7 +27,6 @@ export class GmailProvider extends EmailProvider {
       host: 'imap.gmail.com',
       port: 993,
       tls: true,
-      tlsOptions: { rejectUnauthorized: false },
     });
 
     return new Promise((resolve, reject) => {
@@ -143,6 +142,8 @@ export class GmailProvider extends EmailProvider {
       }
 
       const emails: EmailMessage[] = [];
+      const parsingPromises: Promise<void>[] = [];
+
       const fetch = this.imap.fetch(uids, {
         bodies: '',
         struct: true,
@@ -157,32 +158,38 @@ export class GmailProvider extends EmailProvider {
           });
         });
 
-        msg.once('end', async () => {
-          try {
-            const parsed = await simpleParser(buffer);
-
-            emails.push({
-              id: `gmail-${seqno}`,
-              threadId: parsed.messageId || `thread-${seqno}`,
-              sender: {
-                name: parsed.from?.value[0]?.name,
-                email: parsed.from?.value[0]?.address || 'unknown',
-              },
-              subject: parsed.subject || '(No Subject)',
-              snippet: parsed.text?.substring(0, 200) || '',
-              receivedAt: parsed.date || new Date(),
-              isUnread: true, // Will be updated if we fetch flags
-              sourceUrl: `https://mail.google.com/mail/u/0/#inbox/${seqno}`,
+        msg.once('end', () => {
+          // Create a promise for this message's parsing
+          const parsingPromise = simpleParser(buffer)
+            .then((parsed) => {
+              emails.push({
+                id: `gmail-${seqno}`,
+                threadId: parsed.messageId || `thread-${seqno}`,
+                sender: {
+                  name: parsed.from?.value[0]?.name,
+                  email: parsed.from?.value[0]?.address || 'unknown',
+                },
+                subject: parsed.subject || '(No Subject)',
+                snippet: parsed.text?.substring(0, 200) || '',
+                receivedAt: parsed.date || new Date(),
+                isUnread: true, // Will be updated if we fetch flags
+                sourceUrl: `https://mail.google.com/mail/u/0/#inbox/${seqno}`,
+              });
+            })
+            .catch((error) => {
+              console.error(`[Gmail] Error parsing message ${seqno}:`, error);
             });
-          } catch (error) {
-            console.error(`[Gmail] Error parsing message ${seqno}:`, error);
-          }
+
+          parsingPromises.push(parsingPromise);
         });
       });
 
       fetch.once('error', reject);
 
-      fetch.once('end', () => {
+      fetch.once('end', async () => {
+        // Wait for all parsing to complete
+        await Promise.all(parsingPromises);
+
         // Sort by date, most recent first
         emails.sort((a, b) => b.receivedAt.getTime() - a.receivedAt.getTime());
         resolve(emails);
