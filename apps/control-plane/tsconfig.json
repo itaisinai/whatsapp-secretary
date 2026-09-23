@@ -6,8 +6,15 @@
     "composite": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "strictPropertyInitialization": false
+    "strictPropertyInitialization": false,
+    "baseUrl": ".",
+    "paths": {
+      "@whatsapp-secretary/shared": ["../../packages/shared/src"]
+    }
   },
+  "references": [
+    { "path": "../../packages/shared" }
+  ],
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]
 }

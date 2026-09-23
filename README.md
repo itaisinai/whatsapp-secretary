@@ -53,48 +53,49 @@ cp .env.example .env
    - Email credentials
    - Other configuration values
 
-## Getting Started (POC)
+## Getting Started - WhatsApp POC
 
-### 1. Install Hermes Agent
+### Prerequisites
+
+1. **Install Hermes Agent**
+   ```bash
+   curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash
+   source ~/.bashrc  # or ~/.zshrc
+   ```
+
+2. **Meta WhatsApp Business API Setup**
+   - Create a Meta Developer account
+   - Set up WhatsApp Business API
+   - Get test phone number and access token
+   - Add your personal number as test recipient
+   
+   📖 **See:** [docs/POC_WHATSAPP.md](./docs/POC_WHATSAPP.md) for complete setup
+
+### Quick Start
 
 ```bash
-curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash
-source ~/.bashrc  # or ~/.zshrc
-```
-
-### 2. Setup the Project
-
-```bash
-# Install dependencies
+# 1. Install dependencies
 pnpm install
 
-# Copy environment template
+# 2. Build packages
+pnpm build
+
+# 3. Configure environment
 cp .env.example .env
+# Edit .env with your WhatsApp credentials and MCP server path
 
-# Edit .env with your credentials
-# See docs/POC_SETUP.md for detailed instructions
-nano .env
+# 4. Start the POC server
+pnpm dev:poc
+
+# 5. In another terminal, start ngrok
+ngrok http 3000
+
+# 6. Configure Meta webhook with ngrok URL
+# 7. Test with Meta Dashboard → Send test message
+# 8. Check your WhatsApp for the response!
 ```
 
-### 3. Configure Hermes Integration
-
-```bash
-# Run the setup script
-./scripts/setup-hermes.sh
-```
-
-### 4. Start Using
-
-```bash
-# Start Hermes
-hermes
-
-# Try Hebrew queries:
-# תראה לי את חמשת המיילים האחרונים
-# אילו מיילים עדיין לא קראתי?
-```
-
-📖 **Full usage guide:** [docs/POC_USAGE.md](./docs/POC_USAGE.md)
+📖 **Full POC guide:** [docs/POC_WHATSAPP.md](./docs/POC_WHATSAPP.md)
 
 ## Development
 

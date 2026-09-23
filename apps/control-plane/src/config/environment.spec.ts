@@ -7,11 +7,27 @@ describe('validateEnvironment', () => {
     const result = validateEnvironment({
       WHATSAPP_WEBHOOK_VERIFY_TOKEN: 'verify-token',
       WHATSAPP_APP_SECRET: 'app-secret',
+      WHATSAPP_PHONE_NUMBER_ID: '123456789',
+      WHATSAPP_ACCESS_TOKEN: 'test-token',
+      OPENAI_API_KEY: 'sk-test-key',
     });
     assert.equal(result.PORT, 3000);
   });
 
-  it('rejects missing secrets', () => {
+  it('rejects missing WhatsApp secrets', () => {
     assert.throws(() => validateEnvironment({}), /WHATSAPP_WEBHOOK_VERIFY_TOKEN/);
+  });
+
+  it('rejects missing OpenAI API key', () => {
+    assert.throws(
+      () =>
+        validateEnvironment({
+          WHATSAPP_WEBHOOK_VERIFY_TOKEN: 'verify-token',
+          WHATSAPP_APP_SECRET: 'app-secret',
+          WHATSAPP_PHONE_NUMBER_ID: '123456789',
+          WHATSAPP_ACCESS_TOKEN: 'test-token',
+        }),
+      /OPENAI_API_KEY/,
+    );
   });
 });
